@@ -29,6 +29,7 @@ class CallbackModule(CallbackBase):
         msg['To'] = '<%s>' % play_vars['admin_email']
         with smtplib.SMTP('localhost') as server:
             server.send_message(msg)
+        print('Send admin mail', play_vars['admin_email'])
 
     def _update_tasks(self, task):
         """ Update the host-to-tasks dict. """
@@ -41,7 +42,13 @@ class CallbackModule(CallbackBase):
     # Callback overrides.
 
     def playbook_on_stats(self, stats):
-        """ Process playbook stats event for each host. """
+        """ Process playbook stats event for all hosts. """
+
+        # Send admin email on change or failure.
+        if self._failures:
+            send_admin_email = True
+        else:
+            send_admin_email = False
 
         # Set playbook status to complete or failed.
         status = 'complete'
@@ -57,13 +64,17 @@ class CallbackModule(CallbackBase):
             tasklist[host] = []
             for task in tasks:
                 if task[1]:
+                    send_admin_email = True
                     tasklist[host].append(task)
 
-        # Format and send the admin email.
-        body = 'Playbook tasks:\n\n%s' % pformat(tasklist)
-        if self._failures:
-            body += '\n\n%s' % '\n\n'.join(self._failures)
-        self._email_admin('%s %s' % (self._play.name, status), body)
+        # Send admin mail.
+        if send_admin_email:
+            body = 'Playbook tasks:\n\n%s' % pformat(tasklist)
+            if self._failures:
+                body += '\n\n%s' % '\n\n'.join(self._failures)
+            self._email_admin('%s %s' % (self._play.name, status), body)
+        else:
+            print('No change')
 
     def runner_on_failed(self, host, res, ignore_errors=False):
         """ Process failed task result. """
