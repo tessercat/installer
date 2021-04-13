@@ -110,3 +110,9 @@ Run the playbook.
     -i pbx-deploy/hosts \
     -e @stack-vars.yml \
     -e @pbx-vars.yml
+
+Prep host for dev.
+
+    ansible-playbook pbx-deploy/dev.yml \
+    -i pbx-deploy/hosts \
+    -e @stack-vars.yml
