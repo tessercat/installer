@@ -21,15 +21,22 @@ class CallbackModule(CallbackBase):
 
     def _email_admin(self, subject, body):
         """ Email host admin. """
+        hostname = 'unknown'
+        admin_email = None
+        play_vars = self._play.get_variable_manager().get_vars()
+        if hasattr(play_vars, 'get'):
+            admin_email = play_vars.get('admin_email')
+            hostname = play_vars.get('hostname')
+        if not admin_email:
+            raise Exception('No admin email')
         msg = EmailMessage()
         msg.set_content(body)
-        play_vars = self._play.get_variable_manager().get_vars()
-        msg['Subject'] = '[%s] %s' % (play_vars['hostname'], subject)
-        msg['From'] = '<noreply@%s>' % play_vars['hostname']
-        msg['To'] = '<%s>' % play_vars['admin_email']
+        msg['Subject'] = '[%s] %s' % (hostname, subject)
+        msg['From'] = '<noreply@%s>' % hostname
+        msg['To'] = '<%s>' % admin_email
+        print('Send admin mail', admin_email)
         with smtplib.SMTP('localhost') as server:
             server.send_message(msg)
-        print('Send admin mail', play_vars['admin_email'])
 
     def _update_tasks(self, task):
         """ Update the host-to-tasks dict. """
