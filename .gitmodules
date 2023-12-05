@@ -1,0 +1,16 @@
+[submodule "stack-deploy"]
+	path = stack-deploy
+	url = https://github.com/tessercat/stack-deploy.git
+	branch = dev
+[submodule "index-deploy"]
+	path = index-deploy
+	url = https://github.com/tessercat/index-deploy.git
+	branch = dev
+[submodule "daoistic-deploy"]
+	path = daoistic-deploy
+	url = https://github.com/tessercat/daoistic-deploy.git
+	branch = dev
+[submodule "dict-deploy"]
+	path = dict-deploy
+	url = https://github.com/tessercat/dict-deploy.git
+	branch = dev
